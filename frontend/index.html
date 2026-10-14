@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VisionAssist – Nayana: AI-powered accessibility platform for blind and visually impaired individuals using real-time YOLO11n object detection, EasyOCR text reading, and voice interaction.">
+    <title>VisionAssist – Nayana Vision Assist</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for crisp readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Skip navigation for keyboard/screen reader users -->
+    <a href="#main-content" class="skip-link">Skip to main accessibility controls</a>
+
+    <!-- Live screen reader announcements (WCAG 2.1 AA) -->
+    <div id="srAnnouncer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+    <div class="app-container">
+        <!-- Top Application Header -->
+        <header class="app-header" role="banner">
+            <div class="brand-wrapper">
+                <div class="brand-logo-icon" aria-hidden="true">👁️</div>
+                <div class="brand-titles">
+                    <h1>VisionAssist <span class="saffron-tag">NAYANA AI</span></h1>
+                    <p class="brand-subtitle">AI-Powered Accessibility & Environmental Awareness</p>
+                </div>
+            </div>
+
+            <!-- Live Hardware & Server Status -->
+            <div class="status-indicators" aria-label="System status telemetry">
+                <div class="status-badge" title="FastAPI AI Backend Connection">
+                    <span id="dotBackend" class="status-dot"></span>
+                    <span>Backend AI: <strong id="lblBackend">Connecting...</strong></span>
+                </div>
+                <div class="status-badge" title="Camera Hardware Status">
+                    <span id="dotCamera" class="status-dot"></span>
+                    <span>Camera: <strong id="lblCamera">Standby</strong></span>
+                </div>
+                <div class="status-badge" title="Microphone Status">
+                    <span id="dotMic" class="status-dot"></span>
+                    <span>Mic: <strong id="lblMic">Idle</strong></span>
+                </div>
+                <div class="status-badge" title="Geolocation Status">
+                    <span id="dotGeo" class="status-dot"></span>
+                    <span>Location: <strong id="lblGeo">Standby</strong></span>
+                </div>
+                <button id="btnSettingsModal" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" aria-label="Open voice and audio settings">
+                    ⚙️ Settings
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" role="main" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Prominent Voice Assistant Centerpiece -->
+            <section class="assistant-banner" id="assistantSection" aria-label="Voice Assistant Interaction Hub">
+                <div class="assistant-header">
+                    <div class="assistant-state-wrapper">
+                        <div class="pulse-aura" id="pulseAura" aria-hidden="true"></div>
+                        <h2 class="assistant-state-label" id="assistantStateLabel">VisionAssist Ready</h2>
+                    </div>
+
+                    <!-- Animated Audio Visualizer Bars -->
+                    <div class="audio-visualizer-bars" aria-hidden="true" title="Audio Activity">
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Live Dialogue Speech Bubble -->
+                <div class="assistant-dialogue-box" role="region" aria-label="Spoken assistant response">
+                    <p class="dialogue-text" id="assistantSpeechText">
+                        "Welcome to Nayana VisionAssist. Press the spacebar or click 'Start Listening' to speak a command, or say 'Help' anytime."
+                    </p>
+                    <p class="transcript-hint" id="transcriptHint">
+                        What I heard: <em>None yet</em>
+                    </p>
+                </div>
+
+                <!-- Voice Controls Row -->
+                <div class="voice-controls-row">
+                    <button id="btnListen" class="btn btn-saffron btn-large" aria-label="Start voice listening, press Spacebar">
+                        <span id="micIcon" aria-hidden="true">🎙️</span>
+                        <span id="listenBtnText">Start Listening</span>
+                        <span class="shortcut-badge">Space</span>
+                    </button>
+
+                    <button id="btnStopSpeaking" class="btn btn-danger" aria-label="Stop speech output immediately, press S">
+                        <span aria-hidden="true">⏹️</span>
+                        <span>Stop Speaking</span>
+                        <span class="shortcut-badge">S</span>
+                    </button>
+
+                    <button id="btnRepeat" class="btn btn-secondary" aria-label="Repeat last assistant response, press R">
+                        <span aria-hidden="true">🔁</span>
+                        <span>Repeat Response</span>
+                        <span class="shortcut-badge">R</span>
+                    </button>
+
+                    <button id="btnHelp" class="btn btn-secondary" aria-label="Spoken guide and list of commands, press H">
+                        <span aria-hidden="true">❓</span>
+                        <span>Voice Commands</span>
+                        <span class="shortcut-badge">H</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Workspace: Camera Viewport & Results Panels -->
+            <div class="workspace-grid">
+                
+                <!-- Camera Viewport Card -->
+                <section class="camera-panel" aria-label="Camera Live Feed and Controls">
+                    <div class="panel-header">
+                        <h2 class="panel-title">
+                            <span aria-hidden="true">📷</span>
+                            <span>Live Surroundings Camera</span>
+                        </h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button id="btnFlipCamera" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;" aria-label="Switch between front and back camera">
+                                🔄 Flip Camera
+                            </button>
+                            <button id="btnToggleCamera" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;" aria-label="Turn camera on or off, press C">
+                                <span id="cameraToggleText">Stop Camera</span>
+                                <span class="shortcut-badge">C</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Viewport Canvas & Video Feed -->
+                    <div class="camera-viewport" id="cameraViewport">
+                        <video id="cameraVideo" autoplay playsinline muted></video>
+                        <canvas id="overlayCanvas"></canvas>
+                        <div class="camera-crosshair" aria-hidden="true"></div>
+
+                        <!-- Fallback / Camera Inactive Overlay -->
+                        <div class="camera-placeholder" id="cameraPlaceholder">
+                            <div style="font-size: 2.5rem;" aria-hidden="true">📷</div>
+                            <h3>Camera Feed Suspended</h3>
+                            <p>Enable camera permission or click "Start Camera" to begin real-time computer vision analysis.</p>
+                            <button id="btnStartCameraPrompt" class="btn btn-primary">Start Camera</button>
+                        </div>
+                    </div>
+
+                    <!-- Primary Action Dock -->
+                    <div class="camera-action-dock" role="toolbar" aria-label="Computer vision actions">
+                        <button id="btnDetect" class="btn btn-primary btn-large" aria-label="Describe my surroundings using YOLO11n object detection, press D">
+                            <span aria-hidden="true">👁️</span>
+                            <span>Describe Surroundings</span>
+                            <span class="shortcut-badge">D</span>
+                        </button>
+
+                        <button id="btnOcr" class="btn btn-primary btn-large" aria-label="Read text in front of camera using EasyOCR, press T">
+                            <span aria-hidden="true">📖</span>
+                            <span>Read Text</span>
+                            <span class="shortcut-badge">T</span>
+                        </button>
+
+                        <button id="btnLocation" class="btn btn-saffron btn-large" aria-label="Get current location and address, press L">
+                            <span aria-hidden="true">📍</span>
+                            <span>Where Am I?</span>
+                            <span class="shortcut-badge">L</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Results & Intelligence Panel -->
+                <div class="results-panel" role="region" aria-label="Detection and OCR Results">
+                    
+                    <!-- Detected Objects Card -->
+                    <div class="card" aria-label="Detected objects list">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span aria-hidden="true">🎯</span>
+                                <span>Detected Objects</span>
+                            </h3>
+                            <span id="badgeObjectCount" class="status-badge" style="padding: 2px 8px; font-size: 0.75rem;">0 detected</span>
+                        </div>
+                        <div class="objects-list" id="objectsList" role="list">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 1.5rem;">
+                                No objects detected yet. Press "Describe Surroundings" (Key D) or ask "What objects are in front of me?".
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Read Text (OCR) Card -->
+                    <div class="card" aria-label="Recognized text card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span aria-hidden="true">📄</span>
+                                <span>Recognized Text</span>
+                            </h3>
+                            <div class="card-actions">
+                                <button id="btnCopyText" class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.8rem;" aria-label="Copy recognized text to clipboard">
+                                    📋 Copy
+                                </button>
+                                <button id="btnSpeakText" class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.8rem;" aria-label="Speak recognized text again">
+                                    🔊 Speak
+                                </button>
+                            </div>
+                        </div>
+                        <div class="ocr-display-box" id="ocrDisplayBox" tabindex="0" role="textbox" aria-readonly="true">
+No text captured yet. Hold any document or product package in view and click "Read Text" (Key T).
+                        </div>
+                    </div>
+
+                    <!-- Geolocation Card -->
+                    <div class="card" aria-label="Current location information">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span aria-hidden="true">🗺️</span>
+                                <span>Current Location</span>
+                            </h3>
+                            <span id="locStatusBadge" class="status-badge" style="padding: 2px 8px; font-size: 0.75rem;">GPS Ready</span>
+                        </div>
+                        <div class="location-content" id="locationContent">
+                            <p class="location-address" id="locAddress">Click "Where Am I?" or ask "Where am I?" to retrieve your current address.</p>
+                            <p class="location-coords" id="locCoords">Coordinates: Not requested yet</p>
+                            <a id="locMapLink" class="map-link" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                                <span>Open location in Google Maps ↗</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Voice Commands & Accessibility Reference -->
+            <section class="commands-card" aria-label="Voice commands reference guide">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <span aria-hidden="true">💡</span>
+                        <span>Spoken Voice Commands Guide</span>
+                    </h3>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">Natural speech recognized</span>
+                </div>
+                <div class="commands-grid">
+                    <div class="command-pill">
+                        <span class="cmd-phrase">"Describe my surroundings" / "What's in front of me?"</span>
+                        <span class="cmd-desc">Runs YOLO11n object detection and speaks spatial scene narration.</span>
+                    </div>
+                    <div class="command-pill">
+                        <span class="cmd-phrase">"Read this text" / "Read"</span>
+                        <span class="cmd-desc">Extracts printed/handwritten text using EasyOCR and reads it aloud.</span>
+                    </div>
+                    <div class="command-pill">
+                        <span class="cmd-phrase">"Where am I?" / "What is my location?"</span>
+                        <span class="cmd-desc">Obtains GPS coordinates and speaks your locality, street, and city.</span>
+                    </div>
+                    <div class="command-pill">
+                        <span class="cmd-phrase">"Start the camera" / "Stop the camera"</span>
+                        <span class="cmd-desc">Turns the video camera on or off to preserve power and privacy.</span>
+                    </div>
+                    <div class="command-pill">
+                        <span class="cmd-phrase">"Repeat that" / "Say again"</span>
+                        <span class="cmd-desc">Repeats the previous spoken narration verbatim.</span>
+                    </div>
+                    <div class="command-pill">
+                        <span class="cmd-phrase">"Stop speaking" / "Quiet"</span>
+                        <span class="cmd-desc">Immediately pauses and halts any currently active voice output.</span>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Settings Modal -->
+        <dialog id="settingsDialog" style="background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-active); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 480px; width: 90%; margin: auto; box-shadow: var(--shadow-soft);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 700;">Voice & Accessibility Settings</h3>
+                <button id="btnCloseSettings" class="btn btn-secondary" style="padding: 4px 10px;" aria-label="Close settings">✕</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label for="selectVoice" style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem;">Text-To-Speech Voice</label>
+                    <select id="selectVoice" style="width: 100%; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle); padding: 8px; border-radius: var(--radius-sm); font-size: 0.9rem;"></select>
+                </div>
+
+                <div>
+                    <label for="rangeRate" style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem;">
+                        Speech Rate: <span id="lblRate">1.0x</span>
+                    </label>
+                    <input type="range" id="rangeRate" min="0.7" max="1.5" step="0.1" value="1.0" style="width: 100%;">
+                </div>
+
+                <div>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                        <input type="checkbox" id="chkAudioCues" checked>
+                        <span>Enable Web Audio Tactile Sound Chimes</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label for="txtBackendUrl" style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem;">FastAPI Backend Endpoint</label>
+                    <input type="text" id="txtBackendUrl" value="" placeholder="http://127.0.0.1:8000" style="width: 100%; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle); padding: 8px; border-radius: var(--radius-sm); font-size: 0.9rem; font-family: var(--font-mono);">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button id="btnSaveSettings" class="btn btn-primary" style="padding: 8px 16px;">Save Preferences</button>
+                </div>
+            </div>
+        </dialog>
+
+        <!-- Application Footer -->
+        <footer class="app-footer" role="contentinfo">
+            <p><strong>VisionAssist – Nayana</strong> &copy; Built with Ultralytics YOLO11n, EasyOCR, and Web Speech API.</p>
+            <p>Accessible Keyboard Controls: <kbd>Space</kbd> Speak &bull; <kbd>D</kbd> Detect &bull; <kbd>T</kbd> Read Text &bull; <kbd>L</kbd> Location &bull; <kbd>C</kbd> Camera &bull; <kbd>S</kbd> Stop &bull; <kbd>R</kbd> Repeat &bull; <kbd>H</kbd> Help</p>
+        </footer>
+    </div>
+
+    <!-- Script loading: audio engine first, then main logic -->
+    <script src="audio_cues.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
